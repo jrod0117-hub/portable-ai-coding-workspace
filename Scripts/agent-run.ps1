@@ -1,10 +1,9 @@
 # agent-run.ps1
-# Simple helper for AI agents to run commands inside the portable Linux environment (WSL2)
+# Helper for AI agents to run commands inside the portable Linux environment (WSL2)
 #
-# Usage examples:
-#   .\Scripts\agent-run.ps1 "echo hello"
-#   .\Scripts\agent-run.ps1 "cd /mnt/f/Workspace && git status"
-#   .\Scripts\agent-run.ps1 "python3 --version"
+# Usage:
+#   .\Scripts\agent-run.ps1 "git status"
+#   .\Scripts\agent-run.ps1 "python3 -c 'print(42)'"
 
 param(
     [Parameter(Mandatory=$true)]
@@ -15,14 +14,23 @@ param(
 
 $distro = "Ubuntu"
 
-# Build the full command
-$fullCommand = "cd /mnt/f/Workspace 2>/dev/null || true; $Command"
+# Robust command that falls back if /mnt/f is not mounted
+$bashCommand = @"
+if [ -d /mnt/f/Workspace ]; then
+    cd /mnt/f/Workspace
+elif [ -d /mnt/c/Users ]; then
+    echo 'Note: Using current directory (F: not mounted)'
+else
+    echo 'Note: Workspace path not found'
+fi
+$Command
+"@
 
 if ($Background) {
     Write-Host "Running in background: $Command" -ForegroundColor Yellow
-    Start-Process -FilePath "wsl" -ArgumentList "-d", $distro, "-e", "bash", "-c", $fullCommand -WindowStyle Hidden
+    Start-Process -FilePath "wsl" -ArgumentList "-d", $distro, "-e", "bash", "-c", $bashCommand -WindowStyle Hidden
     Write-Host "Started in background."
 } else {
-    Write-Host ">>> Running on $distro:" -ForegroundColor Cyan
-    wsl -d $distro -e bash -c $fullCommand
+    Write-Host ">>> Running on ${distro}:" -ForegroundColor Cyan
+    wsl -d $distro -e bash -c $bashCommand
 }
