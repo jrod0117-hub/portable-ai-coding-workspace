@@ -1,0 +1,3 @@
+# Placeholder - Git keeps this folder
+# Actual VM disk images are too large for Git (>60GB)
+# Create with: qemu-img create -f qcow2 linux-coding.qcow2 60G

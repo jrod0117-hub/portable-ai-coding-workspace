@@ -1,0 +1,31 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  storage:
+    layout:
+      - auto
+  ssh:
+    install-ssh: true
+    ssh-port: 22
+  user:
+    name: agentuser
+    gecos: AI Agent User
+    groups: sudo, administrators
+    password: agentpassword
+    lock_password: false
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3Nza... (I will replace this with a real key if needed or keep password for first boot)
+  packages:
+    - openssh-server
+    - git
+    - docker.io
+    - build-essential
+    - samba
+  late-commands:
+    - curtin in-target -- target/sbin/useradd -m -G sudo -s /bin/bash agentuser
+    - curtin in-target -- target/usr/bin/passwd -d agentuser
+  user-data:
+    default_user: agentuser

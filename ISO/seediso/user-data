@@ -1,0 +1,21 @@
+#cloud-config
+password: agentpassword
+chpasswd:
+  list: |
+    ubuntu:agentpassword
+    root:agentpassword
+  expire: False
+ssh_pwauth: True
+users:
+  - name: ubuntu
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+packages:
+  - openssh-server
+  - git
+  - docker.io
+  - build-essential
+runcmd:
+  - systemctl enable ssh
+  - systemctl start ssh
+  - ufw allow 22/tcp
