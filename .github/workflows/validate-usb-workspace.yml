@@ -13,11 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup PowerShell
-        uses: actions/setup-powershell@v1
-        with:
-          pwsh-version: '7.x'
-
       - name: Install PSScriptAnalyzer
         run: |
           Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -AllowClobber
